@@ -1,0 +1,16 @@
+<svg height="400" width="500" xmlns="http://www.w3.org/2000/svg">
+    <g transform="rotate(-30,200,200)">
+        <polygon points="200,20 0,400 400,400" style="fill:#0d3c55;stroke:#0d3c55;stroke-width:5" />
+    </g>
+
+    <g transform="rotate(-20,200,200)">
+        <polygon points="200,20 0,400 400,400" style="fill:#0f5b78;stroke:#0f5b78;stroke-width:5" />
+    </g>
+
+    <g transform="rotate(-10,200,200 )">
+        <polygon points="200,20 0,400 400,400" style="fill:#117899;stroke:#117899;stroke-width:5" />
+    </g>
+    <polygon points="200,20 0,400 400,400" style="fill:#1395ba;stroke:#1395ba;stroke-width:5" />
+    <text x="110" y="85%" style="fill:#333333; letter-spacing:0; word-spacing:0; kerning:auto; font-family:Arial; font-size:144px; font-weight:400; font-style:normal; stroke-width:0; font-stretch:normal"><tspan>TC</tspan></text>
+
+</svg> 

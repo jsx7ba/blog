@@ -1,0 +1,58 @@
+baseURL: 'https://tech-concept.io/'
+languageCode: 'en-us'
+title: 'Tech Concept'
+theme: PaperModX
+
+params:
+  css: 
+    - css/lib/chroma-light.css
+    - css/lib/chroma-dark.css
+  profileMode:
+      enabled: true
+      title: "Tech Concept"
+      subtitle: "Explaining is the best learning."
+      imageUrl: "/logo.svg"
+      imageWidth: 250
+      imageHeight: 200
+  socialIcons: 
+    - name: "GitHub"
+      url: "https://github.com/jsx7ba"
+    - name: "LinkedIn"
+      url: "https://www.linkedin.com/in/justin-scheiber/"
+
+markup:
+  highlight: 
+    anchorLineNos: false
+    codeFences: true
+    guessSyntax: false
+    hl_Lines: ""
+    hl_inline: false
+    lineAnchors: ""
+    lineNoStart: 1
+    lineNos: false
+    lineNumbersInTable: true
+    noClasses:  false
+    noHl: false
+    tabWidth: 4
+
+menu:
+  main:
+    - name: Posts
+      pageRef: /post
+      weight: 1
+    - name: Search
+      pageRef: /search
+      weight: 1
+    - name: Tags
+      pageRef: /tags
+      weight: 1
+
+outputs:
+  home:
+    - HTML
+    - JSON
+deployment:
+  targets:
+    name: prod
+    URL: s3://tech-concept.io?region=us-west-2
+
