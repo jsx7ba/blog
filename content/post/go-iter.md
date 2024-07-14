@@ -16,9 +16,9 @@ Go 1.23 introduces iterator functions as a mechanism to support user defined ite
 
 ## The Old Ways
 
-In previous Go versions, no mechanism existed for user defined types to utilize iteration with `range`.  This means iteration over custom types was accomplished in two ways: returning a slice over a complete data set, or ranging over a channel.  
+In previous Go versions, no mechanism existed for user defined types to utilize iteration with `range`.  This means iteration over custom types was accomplished in two ways: returning a slice over a complete data set or ranging over a channel.  
 
-Slicing over an entire data set can be memory intensive, and intuitively doesn't make sense for iterating over something like a tree structure. Ranging over channels can easily create goroutine leaks.  Keep in mind that go doesn't garbage collect goroutines. Goroutines need to exit on their own, or terminate due to a panic.
+Slicing over an entire data set can be memory intensive, and intuitively doesn't make sense for iterating over something like a tree structure. Ranging over channels can easily create goroutine leaks.  Keep in mind that go doesn't garbage collect goroutines. Goroutines need to exit on their own or terminate due to a panic.
 
 ```go {lineNos=table,hl_lines=[3,13]} 
 func testIter() chan int {
@@ -78,7 +78,7 @@ for x := range simpleIter() {
     fmt.Println(x)
 }
 ```
-There are two things to note about the inner function of the iterator: `yield func[V any](v V) bool`.  The first is that it uses a type parameter, `V`.The type argument, IE the instantiation of the type parameter, defines the loop variable type.
+There are two things to note about the inner function of the iterator: `yield func[V any](v V) bool`.  The first is that it uses a type parameter, `V`. The type argument, IE the instantiation of the type parameter, defines the loop variable type.
 
 Second, any `break` statement, `return` statement, `goto` statement that leaves the loop, or panic in the for loop will cause the yield function to return false. The iterator implementation must return when this happens. Failure to handle false return values will cause a panic: 
 
