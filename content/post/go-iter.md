@@ -18,7 +18,7 @@ Go 1.23 introduces iterator functions as a mechanism to support user defined ite
 
 In previous Go versions, no mechanism existed for user defined types to utilize iteration with `range`.  This means iteration over custom types was accomplished in two ways: returning a slice over a complete data set or ranging over a channel.  
 
-Slicing over an entire data set can be memory intensive, and intuitively doesn't make sense for iterating over something like a tree structure. Ranging over channels can easily create goroutine leaks.  Keep in mind that go doesn't garbage collect goroutines. Goroutines need to exit on their own or terminate due to a panic.
+Slicing over an entire data set can be memory intensive, and may not be possible in all cases.  Ranging over channels can easily create goroutine leaks.  Keep in mind that go doesn't garbage collect goroutines. Goroutines need to exit on their own or terminate due to a panic.
 
 ```go {lineNos=table,hl_lines=[3,13]} 
 func testIter() chan int {
