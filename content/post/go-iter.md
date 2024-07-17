@@ -43,19 +43,20 @@ for s := range testIter() {
 The code above leaks a goroutine. The goroutine(line 3) is blocked sending a value to a channel that will never be 
 received after the _break_ statement(line 13).
 
-
 ## The New Way
 Go 1.23 introduces a formal way to implement user-defined iterators in the [`iter`](https://pkg.go.dev/iter@go1.23rc1) package:
 
 > "An iterator is a function that passes successive elements of a sequence to a callback function, conventionally named yield."
 
-The `iter` package introduces just a few types, but the simplest to start with is the single push variable iterator:
+[Seq](https://pkg.go.dev/iter@go1.23rc1#Seq) is one of the types the `iter` package provides, and break it down based on the definition above.
+
 ```go
 type Seq[V any] func(yield func(V) bool)
 ```
-The `Seq` definition reads as: "a function with a yield parameter of type function, which has a generic parameter `V`, and returns `bool`."
 
-Here's an example to break down:
+The `Seq` type has a type parameter `V`, which the call back function `yield` expects to receive as a parameter.  It is the developer's responsibility to implement the function (_'outer function'_ from here on) that receives the yield callback function.   
+
+Here's an example:
 
 ```go {lineNos=table}
 func simpleIter() iter.Seq[int] {
@@ -78,14 +79,13 @@ for x := range simpleIter() {
     fmt.Println(x)
 }
 ```
-There are two things to note about the inner function of the iterator: `yield func[V any](v V) bool`.  The first is that it uses a type parameter, `V`. The type argument, IE the instantiation of the type parameter, defines the loop variable type.
 
-Second, any `break` statement, `return` statement, `goto` statement that leaves the loop, or panic in the for loop will cause the yield function to return false. The iterator implementation must return when this happens. Failure to handle false return values will cause a panic: 
+At a high level, is that the compiler is taking the for-loop body and using that as a call back to the outer function.  More on this in the next section.  Note that any `break` statement, `return` statement, `goto` statement that leaves the loop, or panic in the `for` loop will cause the yield function to return false. The iterator implementation must return when this happens. Failure to handle false return values will cause a panic: 
 
 `runtime error: range function continued iteration after function for loop body returned false.`
 
 ### Rewrites Make it Work
-The go compiler rewrites for loops with a iterator function to code without a iterator function.  The contents of the iterator function will be called by a yield function generated from the `for` loop body. The code in the previous example is rewritten to something like this:
+The go compiler rewrites for loops with an iterator function to code without a iterator function.  The contents of the iterator function will be called by a yield function generated from the `for` loop body. The code in the previous example is rewritten to something like this:
 
 ```go {lineNos=table}
 {
@@ -109,7 +109,7 @@ end:
 }
 ```
 
-Note this example is very trivial, and it's not 100% accurate. It serves only to provide a mental model.  See the [rewrite code](https://go.googlesource.com/go/+/refs/changes/41/510541/7/src/cmd/compile/internal/rangefunc/rewrite.go) for a great explanation of complexity left out here.
+Note this example is very trivial but it does serve as a decent mental model when writing iterators.  See the [rewrite code](https://go.googlesource.com/go/+/refs/changes/41/510541/7/src/cmd/compile/internal/rangefunc/rewrite.go) for a great explanation of the complexity left out here.
 
 ### Example Single Variable Push Iteration
 Here's a more substantial version of an iterator that splits a string.  Each call to the iterator yields another substring. This is a better solution than returning a slice for any moderately large string. 
@@ -146,7 +146,7 @@ three
 ```
 
 ### Two variable Push Iteration
-The `iter` package also provides a two parameter function iterator for looping over a pair of variables.  
+The `iter` package also provides a two-parameter function to iterate on a pair of variables.  
 
 ```go
 type Seq2[K, V any] func(yield func(K, V) bool)
@@ -188,7 +188,7 @@ The output from the example:
 
 ### Pull Iteration
 
-So far this article has only examined push iteration.  Push iteration occurs when the iterator determines when the loop finishes.  Pull iteration occurs when the loop asks the iterator if it is done.  The `iter` package provides functions [`Pull`](https://pkg.go.dev/iter@go1.23rc1#Pull) and [`Pull2`](https://pkg.go.dev/iter@go1.23rc1#Pull2) which correspond to the [`Seq`](https://pkg.go.dev/iter@go1.23rc1#Seq) and [`Seq2`](https://pkg.go.dev/iter@go1.23rc1#Seq2) types.
+So far, this article has only examined push iteration.  Push iteration occurs when the iterator determines when the loop finishes.  Pull iteration occurs when the loop asks the iterator if it is done.  The `iter` package provides functions [`Pull`](https://pkg.go.dev/iter@go1.23rc1#Pull) and [`Pull2`](https://pkg.go.dev/iter@go1.23rc1#Pull2) which correspond to the [`Seq`](https://pkg.go.dev/iter@go1.23rc1#Seq) and [`Seq2`](https://pkg.go.dev/iter@go1.23rc1#Seq2) types.
 
 ```go {lineNos=table}
 func simpleIter() iter.Seq[int] {
@@ -217,8 +217,7 @@ for {
 }
 ```
 
-The `iter` package documentation gives an [example](https://pkg.go.dev/iter@go1.23rc1#hdr-Pulling_Values) of using Pull 
-when composing two Push iterators together.
+The `iter` package documentation gives an [example](https://pkg.go.dev/iter@go1.23rc1#hdr-Pulling_Values) of using Pull when composing two Push iterators together.  I can't think of another use case becuase a push iterator must always be written first.
 
 ## Summary and key points
 Iterator functions are a clever solution to allowing custom iterators in a backwards compatible way.  They're easy to reason about and the compiler shouldn't generate any surprising code to accommodate them.
