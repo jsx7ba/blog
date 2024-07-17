@@ -174,7 +174,7 @@ func stringSplit2(delim byte, value string) iter.Seq2[int, string] {
 }
 
 for i, s := range stringSplit2(',', "one,fish,two,fish") {
-    fmt.Printf(i, s)
+    fmt.Println(i, s)
 }
 ```
 
