@@ -22,7 +22,7 @@
 /* NameAttribute */ .chroma .na {  }
 /* NameBuiltin */ .chroma .nb {  }
 /* NameBuiltinPseudo */ .chroma .bp {  }
-/* NameClass */ .chroma .nc { color:#f0883e;font-weight:bold }
+/* NameClass */ .chroma .nc { color:#f0883e; }
 /* NameConstant */ .chroma .no { color:#79c0ff;font-weight:bold }
 /* NameDecorator */ .chroma .nd { color:#d2a8ff;font-weight:bold }
 /* NameEntity */ .chroma .ni { color:#ffa657 }
