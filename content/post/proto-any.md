@@ -9,7 +9,7 @@ ShowCodeCopyButtons: true
 
 ## Introduction
 
-This article utilizes [Protocol Buffers](https://protobuf.dev/) and [GRPC](https://grpc.io/) in the context of creating a [key value store](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) in Go.  Protocol Buffers are a great way to serialize message data for transmission and GRPC builds on Protocol Buffers to describe services and how the messages passed between them.  A simplistic put request for a key value store could be described with the following protocol buffer code:
+This post utilizes [Protocol Buffers](https://protobuf.dev/) and [GRPC](https://grpc.io/) in the context of creating a [key value store](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) in Go.  Protocol Buffers are a great way to serialize message data for transmission and GRPC builds on Protocol Buffers to describe services and how the messages passed between them.  A simplistic put request for a key value store could be described with the following protocol buffer code:
 
 ```protobuf {lineNos=table}
 message PutRequest {
@@ -27,7 +27,7 @@ type PutRequest struct {
 }
 ```
 
-The client code can easily access the `Value` field.  However, This PutRequest isn't ideal in the context of the key value store because it only stores strings.  Procol Buffers provide a field type called `Any` to allow a field to represent multiple types.  
+The client code can easily access the `Value` field.  However, This `PutRequest` isn't ideal in the context of the key value store because it only stores strings.  Procol Buffers provide a field type called `Any` to allow a field to represent multiple types.  
 
 ## Using protobuf.Any
 
@@ -36,7 +36,7 @@ Using the `protobuf.Any` type requires changing the protocol buffer file:
 * Including `any.proto`
 * Changing `value` field type to `google.protobuf.Any`
 
-So now the protocol bufffer file looks like this:
+So now the protocol buffer file looks like this:
 
 ```protobuf {lineNos=table}
 syntax = "proto3";
@@ -48,7 +48,7 @@ message PutRequest {
 }
 ```
 
-That was easy.  However, getting the value from the generated code is now more complicated.  The Value field now expects a pointer to a `anypb.Any` type.
+That was easy.  However, getting the value from the generated code is more complicated.  The Value field now expects a pointer to a `anypb.Any` type.
 ```go {lineNos=table,hl_lines=[3]}
 type PutRequest struct {
    Key   string
@@ -65,7 +65,7 @@ type struct Any {
 }
 ```
 
-The `anypb.Any` struct contains two fields.  The `TypeUrl` field is a string containing the message type in the form of a url: `type.googleapis.com/google.protobuf.StringValue`.  The `Value` field is a slice of bytes. So the `TypeUrl` field indicates how to interpret the slice of bytes in `Value`. 
+The `anypb.Any` struct contains two fields.  The `TypeUrl` field is a string containing the message type in the form of a URL: `type.googleapis.com/google.protobuf.StringValue`.  The `Value` field is a slice of bytes. So the `TypeUrl` field indicates how to interpret the slice of bytes in `Value`. 
 
 Working with the `anypb.Any` type requires two Go packages to be installed: [anypb](https://pkg.go.dev/google.golang.org/protobuf/types/known/anypb) and [wrapperspb](https://pkg.go.dev/google.golang.org/protobuf/types/known/wrapperspb).  The `anypb` package defines the `anypb.Any` struct and the methods for marshalling values through it.  The `wrapperspb` package provides structs for wrapping simple scalar types.
 
@@ -148,11 +148,16 @@ case *gen.StringArray:
 
 ## Conclusion
 
-Using `anypb.Any` field type in Protocol Buffers is an easy way allow a Protocol Buffer message field to have multiple types.
+Protocol Buffers provide a field type `google.protobuf.Any` which is one way model a field with multiple types.  Using an `Any` type requires a bit more work to get values in and out of a message.
 
-* Marshalling and unmarshalling requires a wrapper messages. 
+* Marshaling and unmarshal requires a wrapper messages. 
     * Primitive types can use messages from [wrapperspb](https://pkg.go.dev/google.golang.org/protobuf/types/known/wrapperspb)
     * Complex or array types need wrapped in custom messages
+* Use [anypb.New()](https://pkg.go.dev/google.golang.org/protobuf/types/known/anypb#UnmarshalNew) to create `anypb.Any` values
+* Use [anypb.Any.UnmarshalNew()](https://pkg.go.dev/google.golang.org/protobuf/types/known/anypb#UnmarshalNew) and [anypb.Any.UnmarshalTo](https://pkg.go.dev/google.golang.org/protobuf/types/known/anypb#UnmarshalTo) to unmarshal messages.
 
-The complete protocol buffer file can be found here, and the Go code that marshals the types can be found here.
+These gists illustrate all the concepts discussed above:
+* [protocol buffer file](https://gist.github.com/jsx7ba/2e9ce0b4d14f5a318a2fe640d7a8f596)
+* [go source](https://gist.github.com/jsx7ba/81335aa7d6bfc66a426b09d0c199c6a5)
+
 
