@@ -74,9 +74,9 @@ Working with the `anypb.Any` type requires two Go packages to be installed: [any
 Marshalling an `interface{}` value through an `anypb.Any` field requires 3 steps:
 1. A type switch to determine which wrapper to use (line 3)
 2. Creating the wrapper message (line 5)
-3. Calling [`anypb.New()`](https://pkg.go.dev/google.golang.org/protobuf/types/known/anypb#New) on the wrapper message (line 12)
+3. Calling [`anypb.New()`](https://pkg.go.dev/google.golang.org/protobuf/types/known/anypb#New) on the wrapper message (line 10)
 
-```go {lineNos=table,hl_lines=[3,5,12]}
+```go {lineNos=table,hl_lines=[3,5,10]}
 func Marshal(val interface{}) (*anypb.Any, error) {
     var m proto.Message
     switch v := val.(type) {
@@ -94,10 +94,10 @@ func Marshal(val interface{}) (*anypb.Any, error) {
 
 Unmarshalling is also accomplished in 3 steps:
 1. Calling [UnmarshalNew()](https://pkg.go.dev/google.golang.org/protobuf/types/known/anypb#UnmarshalNew) method on the value field (line 2)
-2. Determine the type of the field in a type switch (line 8)
+2. Determine the type of the field in a type switch (line 5)
 3. Calling [UnmarshalTo()](https://pkg.go.dev/google.golang.org/protobuf/types/known/anypb#UnmarshalTo) method (line 9)
 
-```go {lineNos=table,hl_lines=[2,7,9]}
+```go {lineNos=table,hl_lines=[2,5,9]}
 func (s *KVServer) Put(ctx context.Context, r *gen.PutRequest) (*gen.Response, error) {
     m, err := r.value.UnmarshalNew()
     // handle error
@@ -120,7 +120,7 @@ func (s *KVServer) Put(ctx context.Context, r *gen.PutRequest) (*gen.Response, e
 
 ### Handling Array Types
 
-The `wrapperspb` package doesn't provide any way to wrap complex or array types, but it's strait forward to support.  First, define a message with a [repeated](https://protobuf.dev/programming-guides/proto3/#field-labels) type:
+The `wrapperspb` package doesn't provide any way to wrap complex or array types, but it's straight forward to support.  First, define a message with a [repeated](https://protobuf.dev/programming-guides/proto3/#field-labels) type:
 
 ```protobuf
 message StringArray {
