@@ -44,11 +44,11 @@ The code above leaks a goroutine. The goroutine(line 3) is blocked sending a val
 received after the _break_ statement(line 13).
 
 ## The New Way
-Go 1.23 introduces a formal way to implement user-defined iterators in the [`iter`](https://pkg.go.dev/iter@go1.23rc1) package:
+Go 1.23 introduces a formal way to implement user-defined iterators in the [`iter`](https://pkg.go.dev/iter) package:
 
 > "An iterator is a function that passes successive elements of a sequence to a callback function, conventionally named yield."
 
-[Seq](https://pkg.go.dev/iter@go1.23rc1#Seq) is one of the types the `iter` package provides, and break it down based on the definition above.
+[Seq](https://pkg.go.dev/iter#Seq) is one of the types the `iter` package provides, and break it down based on the definition above.
 
 ```go
 type Seq[V any] func(yield func(V) bool)
@@ -188,7 +188,7 @@ The output from the example:
 
 ### Pull Iteration
 
-So far, this article has only examined push iteration.  Push iteration occurs when the iterator determines when the loop finishes.  Pull iteration occurs when the loop asks the iterator if it is done.  The `iter` package provides functions [`Pull`](https://pkg.go.dev/iter@go1.23rc1#Pull) and [`Pull2`](https://pkg.go.dev/iter@go1.23rc1#Pull2) which correspond to the [`Seq`](https://pkg.go.dev/iter@go1.23rc1#Seq) and [`Seq2`](https://pkg.go.dev/iter@go1.23rc1#Seq2) types.
+So far, this article has only examined push iteration.  Push iteration occurs when the iterator determines when the loop finishes.  Pull iteration occurs when the loop asks the iterator if it is done.  The `iter` package provides functions [`Pull`](https://pkg.go.dev/iter#Pull) and [`Pull2`](https://pkg.go.dev/iter#Pull2) which correspond to the [`Seq`](https://pkg.go.dev/iter#Seq) and [`Seq2`](https://pkg.go.dev/iter#Seq2) types.
 
 ```go {lineNos=table}
 func simpleIter() iter.Seq[int] {
@@ -217,18 +217,18 @@ for {
 }
 ```
 
-The `iter` package documentation gives an [example](https://pkg.go.dev/iter@go1.23rc1#hdr-Pulling_Values) of using Pull when composing two Push iterators together.  I can't think of another use case becuase a push iterator must always be written first.
+The `iter` package documentation gives an [example](https://pkg.go.dev/iter#hdr-Pulling_Values) of using Pull when composing two Push iterators together.  I can't think of another use case becuase a push iterator must always be written first.
 
 ## Summary and key points
 Iterator functions are a clever solution to allowing custom iterators in a backwards compatible way.  They're easy to reason about and the compiler shouldn't generate any surprising code to accommodate them.
 
 * Iterator functions should return `iter.Seq` or `iter.Seq2`
 * Iterator functions must exit when yield returns false
-* Follow the [naming conventions](https://pkg.go.dev/iter@go1.23rc1#hdr-Naming_Conventions) for custom types
+* Follow the [naming conventions](https://pkg.go.dev/iter#hdr-Naming_Conventions) for custom types
 
 
 ## Sources
 * [Rangefunc Experiment](https://go.dev/wiki/RangefuncExperiment)
-* [iter Package](https://pkg.go.dev/iter@go1.23rc1)
+* [iter Package](https://pkg.go.dev/iter)
 * [The Go Programming Language Specification](https://go.dev/ref/spec)
 
